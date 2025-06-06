@@ -98,3 +98,28 @@ export interface ExtendedSlide extends Slide {
   media?: MediaElement[]
   layout?: 'default' | 'split' | 'full-image' | 'title-only'
 }
+
+export interface Slide {
+  id: number
+  title: string
+  content: string
+  order: number
+  presentationId: number
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface Presentation {
+  id: number
+  title: string
+  description?: string
+  slides: Slide[]
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface ApiResponse<T> {
+  data: T
+  success: boolean
+  message?: string
+}

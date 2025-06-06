@@ -1,20 +1,181 @@
 'use client'
-import { Slide } from '../types/index'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Edit3, Save, X, Plus, Trash2, MoreHorizontal } from 'lucide-react'
 
-interface PresentationViewerProps {
-  slide: Slide
-  currentIndex: number
-  totalSlides: number
+// Define the Slide type to match your database structure
+interface Slide {
+  id: number
+  title: string
+  content: string
+  order: number
 }
 
-export default function PresentationViewer({ slide, currentIndex, totalSlides }: PresentationViewerProps) {
+interface PresentationViewerProps {
+  slide: Slide | null
+  currentIndex: number
+  totalSlides: number
+  onSlideUpdate: (slide: Slide) => void
+  onSlideDelete: (slideId: number) => void
+  onSlideCreate: (slide: Omit<Slide, 'id'>) => void
+}
+
+export default function PresentationViewer({ 
+  slide, 
+  currentIndex, 
+  totalSlides, 
+  onSlideUpdate,
+  onSlideDelete,
+  onSlideCreate 
+}: PresentationViewerProps) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [editContent, setEditContent] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [showActions, setShowActions] = useState(false)
+
+  // Initialize edit state when slide changes
+  useEffect(() => {
+    if (slide) {
+      setEditTitle(slide.title)
+      setEditContent(slide.content)
+    }
+  }, [slide])
+
   // Notify sidebar of slide changes
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('slideChange', { 
       detail: { slideIndex: currentIndex } 
     }))
   }, [currentIndex])
+
+  const handleSave = async () => {
+    if (!slide) return
+    
+    setIsSaving(true)
+    try {
+      const response = await fetch(`http://localhost:3001/api/slides/${slide.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: editTitle.trim(),
+          content: editContent.trim(),
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save slide')
+      }
+
+      const updatedSlide = await response.json()
+      onSlideUpdate(updatedSlide)
+      setIsEditing(false)
+      setShowActions(false)
+    } catch (error) {
+      console.error('Error saving slide:', error)
+      alert('Failed to save slide. Please try again.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleCancel = () => {
+    if (slide) {
+      setEditTitle(slide.title)
+      setEditContent(slide.content)
+    }
+    setIsEditing(false)
+    setShowActions(false)
+  }
+
+  const handleDelete = async () => {
+    if (!slide) return
+    
+    if (!confirm('Are you sure you want to delete this slide? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3001/api/slides/${slide.id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete slide')
+      }
+
+      onSlideDelete(slide.id)
+      setShowActions(false)
+    } catch (error) {
+      console.error('Error deleting slide:', error)
+      alert('Failed to delete slide. Please try again.')
+    }
+  }
+
+  const handleAddSlide = async () => {
+    const newSlide = {
+      title: 'New Slide',
+      content: '# New Slide\n\nAdd your content here...',
+      order: totalSlides
+    }
+
+    try {
+      const response = await fetch('http://localhost:3001/api/slides', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newSlide),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create slide')
+      }
+
+      const createdSlide = await response.json()
+      onSlideCreate(createdSlide)
+      setShowActions(false)
+    } catch (error) {
+      console.error('Error creating slide:', error)
+      alert('Failed to create slide. Please try again.')
+    }
+  }
+
+  // Handle case where slide might be undefined
+  if (!slide) {
+    return (
+      <div className="h-full flex flex-col bg-gray-50">
+        {/* Minimal header */}
+        <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-100">
+          <div className="flex items-center space-x-3">
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span className="text-sm text-gray-600">Presentation</span>
+          </div>
+          <button
+            onClick={handleAddSlide}
+            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="Add slide"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+        
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-gray-400 mb-6 text-lg">No slides yet</div>
+            <button
+              onClick={handleAddSlide}
+              className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus size={20} />
+              <span>Create your first slide</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Convert markdown-like content to JSX with proper spacing and constraints
   const renderContent = (content: string) => {
@@ -29,7 +190,7 @@ export default function PresentationViewer({ slide, currentIndex, totalSlides }:
             <h1 className="text-5xl font-bold text-gray-800 leading-tight">
               {line.slice(2)}
             </h1>
-            <div className="w-24 h-1 bg-blue-600 mx-auto mt-4 rounded"></div>
+            <div className="w-16 h-0.5 bg-blue-500 mx-auto mt-6"></div>
           </div>
         )
       }
@@ -38,7 +199,7 @@ export default function PresentationViewer({ slide, currentIndex, totalSlides }:
       if (line.startsWith('## ')) {
         return (
           <div key={index} className="mb-6">
-            <h2 className="text-3xl font-semibold text-gray-700 border-b border-gray-300 pb-2">
+            <h2 className="text-3xl font-semibold text-gray-700 mb-3">
               {line.slice(3)}
             </h2>
           </div>
@@ -48,8 +209,7 @@ export default function PresentationViewer({ slide, currentIndex, totalSlides }:
       // Subsection headers (### ) - Left aligned, smaller
       if (line.startsWith('### ')) {
         return (
-          <h3 key={index} className="text-2xl font-medium text-gray-600 mb-4 flex items-center">
-            <span className="w-1 h-6 bg-blue-500 mr-3 rounded"></span>
+          <h3 key={index} className="text-2xl font-medium text-gray-600 mb-4">
             {line.slice(4)}
           </h3>
         )
@@ -68,14 +228,14 @@ export default function PresentationViewer({ slide, currentIndex, totalSlides }:
         if (isLastBullet) {
           const listItems = bulletPoints.map((item, i) => (
             <li key={i} className="text-xl mb-3 text-gray-700 leading-relaxed flex items-start">
-              <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mr-4 mt-2 flex-shrink-0"></span>
+              <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full mr-4 mt-2.5 flex-shrink-0"></span>
               <span dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-800 font-semibold">$1</strong>').replace(/\*(.*?)\*/g, '<em class="text-gray-600">$1</em>') }}></span>
             </li>
           ))
           bulletPoints = [] // Reset for next list
           
           return (
-            <ul key={index} className="mb-6 ml-2">
+            <ul key={index} className="mb-6">
               {listItems}
             </ul>
           )
@@ -89,11 +249,11 @@ export default function PresentationViewer({ slide, currentIndex, totalSlides }:
         if (match) {
           return (
             <div key={index} className="text-xl mb-3 text-gray-700 leading-relaxed flex items-start">
-              <span className="inline-block w-8 h-8 bg-blue-500 text-white text-sm font-bold rounded-full mr-4 flex-shrink-0 flex items-center justify-center">
+              <span className="inline-block w-6 h-6 bg-blue-500 text-white text-sm font-medium rounded-full mr-4 flex-shrink-0 flex items-center justify-center">
                 {line.match(/^\d+/)?.[0]}
               </span>
               <span 
-                className="mt-1"
+                className="mt-0.5"
                 dangerouslySetInnerHTML={{ 
                   __html: match[1].replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-800 font-semibold">$1</strong>').replace(/\*(.*?)\*/g, '<em class="text-gray-600">$1</em>') 
                 }}
@@ -120,51 +280,139 @@ export default function PresentationViewer({ slide, currentIndex, totalSlides }:
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-gray-100 to-gray-200">
-      {/* PowerPoint-style top bar */}
-      <div className="bg-white border-b border-gray-300 px-6 py-2 flex items-center justify-between shadow-sm">
-        <div className="flex items-center space-x-4">
-          <div className="w-6 h-6 bg-gradient-to-br from-orange-400 to-orange-600 rounded-sm flex items-center justify-center">
-            <span className="text-white text-xs font-bold">P</span>
-          </div>
-          <span className="text-gray-700 font-medium">PowerPoint</span>
+    <div className="h-full flex flex-col bg-gray-50">
+      {/* Minimal header */}
+      <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-100">
+        <div className="flex items-center space-x-3">
+          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <span className="text-sm text-gray-600">
+            {isEditing ? `Editing: ${slide.title}` : slide.title}
+          </span>
         </div>
-        <div className="text-sm text-gray-600">
-          {slide.title}
+        
+        <div className="flex items-center space-x-1">
+          {isEditing ? (
+            <>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50"
+                title="Save changes"
+              >
+                <Save size={18} />
+              </button>
+              <button
+                onClick={handleCancel}
+                className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Cancel editing"
+              >
+                <X size={18} />
+              </button>
+            </>
+          ) : (
+            <div className="relative">
+              <button
+                onClick={() => setShowActions(!showActions)}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title="More actions"
+              >
+                <MoreHorizontal size={18} />
+              </button>
+              
+              {showActions && (
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 min-w-[120px]">
+                  <button
+                    onClick={() => {
+                      setIsEditing(true)
+                      setShowActions(false)
+                    }}
+                    className="w-full flex items-center space-x-2 px-3 py-2 text-left text-gray-700 hover:bg-gray-50 text-sm"
+                  >
+                    <Edit3 size={14} />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={handleAddSlide}
+                    className="w-full flex items-center space-x-2 px-3 py-2 text-left text-gray-700 hover:bg-gray-50 text-sm"
+                  >
+                    <Plus size={14} />
+                    <span>Add slide</span>
+                  </button>
+                  <hr className="my-1 border-gray-200" />
+                  <button
+                    onClick={handleDelete}
+                    className="w-full flex items-center space-x-2 px-3 py-2 text-left text-red-600 hover:bg-red-50 text-sm"
+                  >
+                    <Trash2 size={14} />
+                    <span>Delete</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Slide counter */}
-      <div className="absolute bottom-6 right-6 bg-white px-4 py-2 rounded-lg shadow-md text-sm text-gray-600 z-10 border border-gray-200">
-        <span className="font-medium">{currentIndex + 1}</span>
-        <span className="mx-1 text-gray-400">/</span>
-        <span>{totalSlides}</span>
+      {/* Slide counter - more subtle */}
+      <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-500 border border-gray-200">
+        {currentIndex + 1} / {totalSlides}
       </div>
 
-      {/* Main slide area - Fixed dimensions like real PowerPoint */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-6xl aspect-[16/9] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col border border-gray-300">
-          {/* Content area with fixed boundaries - like a real slide */}
-          <div className="flex-1 p-16 bg-white overflow-hidden">
+      {/* Main slide area */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-3xl aspect-[16/9] bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+          {/* Content area */}
+          <div className="flex-1 p-8 bg-white overflow-hidden">
             <div className="h-full w-full">
-              <div className="h-full flex flex-col justify-start">
-                {renderContent(slide.content)}
-              </div>
+              {isEditing ? (
+                <div className="h-full flex flex-col space-y-6">
+                  {/* Title Editor */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Slide title"
+                    />
+                  </div>
+                  
+                  {/* Content Editor */}
+                  <div className="flex-1 flex flex-col">
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Content
+                    </label>
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
+                      placeholder="# Title&#10;&#10;Your content here...&#10;&#10;- Bullet point&#10;- Another point"
+                    />
+                    <div className="mt-2 text-xs text-gray-400">
+                      Supports markdown: # titles, ## headers, - bullets, **bold**, *italic*
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-full flex flex-col justify-start">
+                  {renderContent(slide.content)}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Enhanced progress bar */}
-      <div className="h-3 bg-gray-300 relative">
+      
+      {/* Click outside to close actions menu */}
+      {showActions && (
         <div 
-          className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out relative overflow-hidden" 
-          style={{ width: `${((currentIndex + 1) / totalSlides) * 100}%` }}
-        >
-          <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-pulse"></div>
-        </div>
-        <div className="absolute top-0 right-0 h-full w-px bg-gray-400"></div>
-      </div>
+          className="fixed inset-0 z-10" 
+          onClick={() => setShowActions(false)}
+        />
+      )}
     </div>
   )
 }
