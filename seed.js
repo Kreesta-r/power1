@@ -3,89 +3,322 @@ const { sequelize, Slide } = require('./models');
 const slidesData = [
   {
     id: 1,
-    title: "Welcome",
-    content: `# Welcome to Our Presentation
+    title: "Project Overview",
+    content: `# PowerPoint Clone Web Application
 
-## Modern Web Development Platform
+## Full-Stack Presentation Platform
 
-**Built with cutting-edge technology**
+**Built with Modern Technology Stack**
 
-• Next.js 14 Framework
-• TypeScript Integration  
-• Tailwind CSS Styling
-• Responsive Design
+• Next.js 14 with React 18
+• TypeScript for type safety
+• Tailwind CSS for styling
+• Sequelize ORM with SQLite
+• Vercel frontend deployment
+• Railway backend deployment
 
-*Professional presentations made simple*`,
+*Stripped-down PowerPoint with Markdown support*`,
     order: 1
   },
   {
     id: 2,
-    title: "Key Features",
-    content: `# Key Features
+    title: "Architecture Overview",
+    content: `# System Architecture
 
-## What Sets Us Apart
+## Separated Frontend and Backend
 
-**🎯 Core Capabilities**
-• Responsive across all devices
-• Intuitive keyboard navigation
-• Smart sidebar controls
-• Real-time progress tracking`,
+**Frontend Layer**
+• Next.js React application
+• Deployed on Vercel platform
+• Client-side routing and state management
+• Responsive UI components
+• Real-time markdown parsing
+
+**Backend Layer**
+• Express.js API server
+• Deployed on Railway platform
+• RESTful endpoints with CRUD operations`,
     order: 2
   },
   {
     id: 3,
-    title: "Rich Content",
-    content: `# Rich Content Support
+    title: "Technology Decisions",
+    content: `# Key Technology Choices
 
-## Professional Formatting
+## Strategic Framework Selection
 
-**Text Styling Options**
-• **Bold emphasis** for key points
-• *Italic text* for subtle emphasis
-• Clean bullet organization`,
+**Next.js Benefits**
+• Server-side rendering capability
+• Built-in optimization features
+• Excellent developer experience
+• Seamless Vercel integration
+
+**Tailwind CSS Advantages**
+• Minimal external dependencies
+• Utility-first approach
+• Consistent design system
+• Reduced CSS file complexity`,
     order: 3
   },
   {
     id: 4,
-    title: "Navigation",
-    content: `# Seamless Navigation
+    title: "Database Design",
+    content: `# Data Architecture
 
-## Multiple Control Methods
+## SQLite with Sequelize ORM
 
-**⌨️ Keyboard Controls**
-• Arrow keys (← →) for navigation
-• Spacebar for advancing slides
-• ESC for presentation overview`,
+**Database Schema**
+• Slides table with core fields
+• Order-based slide sequencing
+• Markdown content storage
+• Efficient querying patterns
+
+**ORM Benefits**
+• Type-safe database operations
+• Migration management
+• Model validation and relationships`,
     order: 4
   },
   {
     id: 5,
-    title: "Customization",
-    content: `# Flexible Customization
+    title: "Frontend Implementation",
+    content: `# Frontend Architecture
 
-## Tailored to Your Needs
+## Component-Based Design
 
-**🎨 Design System**
-• Professional color schemes
-• Responsive layouts
-• Smooth animations
-• Brand consistency`,
+**Core Components**
+• SlideViewer for presentation display
+• MarkdownEditor for content editing
+• NavigationControls for user interaction
+• ProgressBar for visual feedback
+• DragDropInterface for slide reordering
+
+**State Management**
+• React hooks for local state
+• Context API for global state management`,
     order: 5
   },
   {
     id: 6,
-    title: "Get Started",
-    content: `# Ready to Begin?
+    title: "Markdown Processing",
+    content: `# Markdown to AST Pipeline
 
-## Your Next Steps
+## Custom Parsing Implementation
 
-**🚀 Quick Setup Process**
+**Processing Flow**
+• Markdown input validation
+• AST generation from source content
+• Component tree rendering
+• Syntax highlighting integration
 
-1. **Clone** the repository
-2. **Install** dependencies
-3. **Customize** your content
-4. **Present** with confidence`,
+**Advanced Features**
+• Language-specific code highlighting
+• Professional formatting
+• Custom markdown extensions support`,
     order: 6
+  },
+  {
+    id: 7,
+    title: "User Experience Features",
+    content: `# Enhanced User Experience
+
+## Navigation and Interaction
+
+**Keyboard Navigation**
+• Arrow keys for slide movement
+• Spacebar for presentation mode
+• ESC key for editor toggle
+
+**Drag and Drop Functionality**
+• Intuitive slide reordering
+• Visual feedback during operations
+• Persistent order changes
+
+**Mobile Responsiveness**
+• Touch gesture support
+• Adaptive layout system`,
+    order: 7
+  },
+  {
+    id: 8,
+    title: "CRUD Operations",
+    content: `# Complete Slide Management
+
+## Full Create, Read, Update, Delete
+
+**Slide Creation**
+• Dynamic slide addition
+• Real-time content preview
+• Automatic order assignment
+
+**Slide Editing**
+• In-place content modification
+• Live markdown rendering
+• Auto-save functionality
+
+**Slide Deletion**
+• Confirmation dialogs
+• Order rebalancing after removal`,
+    order: 8
+  },
+  {
+    id: 9,
+    title: "API Design",
+    content: `# RESTful API Architecture
+
+## Backend Service Endpoints
+
+**Core API Routes**
+• GET /api/slides - Retrieve all slides
+• POST /api/slides - Create new slide
+• PUT /api/slides/:id - Update slide content
+• DELETE /api/slides/:id - Remove slide
+• PATCH /api/slides/reorder - Update slide order
+
+**Data Validation**
+• Request payload validation
+• Error handling middleware
+• Response standardization`,
+    order: 9
+  },
+  {
+    id: 10,
+    title: "Design Considerations",
+    content: `# Design Philosophy
+
+## Scalability and Maintainability
+
+**Modular Architecture**
+• Component separation of concerns
+• Reusable UI elements
+• Clean code organization
+• Extensible markdown parser
+
+**Performance Considerations**
+• Efficient re-rendering strategies
+• Optimized database queries
+• Lazy loading implementation
+• Bundle size optimization`,
+    order: 10
+  },
+  {
+    id: 11,
+    title: "Deployment Strategy",
+    content: `# Two-Platform Deployment
+
+## Frontend and Backend Separation
+
+**Vercel Frontend Deployment**
+• Automatic builds from Git
+• Global CDN distribution
+• Serverless function support
+• Environment variable management
+
+**Railway Backend Deployment**
+• Persistent SQLite database
+• Container-based deployment
+• Automatic SSL certificates
+• Database file persistence`,
+    order: 11
+  },
+  {
+    id: 12,
+    title: "Deployment Challenges",
+    content: `# Technical Challenges Faced
+
+## SQLite Database Hosting
+
+**Initial Challenge**
+• Vercel serverless limitations
+• SQLite file persistence issues
+• Database state management
+
+**Solution Implementation**
+• Railway platform selection
+• Persistent file system support
+• Cross-origin resource sharing configuration
+• Environment-specific database paths`,
+    order: 12
+  },
+  {
+    id: 13,
+    title: "Testing Implementation",
+    content: `# Quality Assurance Approach
+
+## Comprehensive Testing Strategy
+
+**Unit Testing**
+• Component functionality tests
+• Utility function validation
+• Markdown parser testing
+• API endpoint verification
+
+**Integration Testing**
+• End-to-end user workflows
+• Database operation testing
+• Cross-browser compatibility
+• Mobile device responsiveness`,
+    order: 13
+  },
+  {
+    id: 14,
+    title: "Component Library",
+    content: `# Storybook Integration
+
+## Design System Documentation
+
+**Component Documentation**
+• Isolated component development
+• Visual component library
+• Interactive component playground
+• Design consistency validation
+
+**Development Benefits**
+• Faster component iteration
+• Better collaboration workflow
+• Regression testing support
+• Style guide maintenance`,
+    order: 14
+  },
+  {
+    id: 15,
+    title: "Key Takeaways",
+    content: `# Project Insights
+
+## Lessons Learned
+
+**Technical Insights**
+• Next.js provides excellent developer experience
+• Tailwind CSS significantly reduces CSS complexity
+• Platform-specific deployment requires careful planning
+• Component testing improves code reliability
+
+**Architecture Decisions**
+• Separation of frontend and backend proved beneficial
+• SQLite works well for development and small applications
+• Drag and drop enhances user experience significantly`,
+    order: 15
+  },
+  {
+    id: 16,
+    title: "Project Completion",
+    content: `# Delivered Solution
+
+## Requirements Fulfilled
+
+**Core Functionality**
+• Full-stack presentation platform
+• Markdown-powered slide content
+• Complete CRUD operations
+• Drag and drop slide reordering
+• Modern responsive design
+• Production-ready deployment
+
+**Technical Excellence**
+• Clean, maintainable codebase
+• Comprehensive testing coverage
+• Professional deployment strategy`,
+    order: 16
   }
 ];
 
