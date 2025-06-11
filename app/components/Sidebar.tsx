@@ -198,7 +198,7 @@ export default function Sidebar({ onSlideUpdate }: SidebarProps = {}) {
     const elements: ReactElement[] = []
     
     lines.forEach((line, index) => {
-      // Main title (# ) - Center aligned
+    
       if (line.startsWith('# ')) {
         elements.push(
           <div key={index} className="text-center mb-2">
