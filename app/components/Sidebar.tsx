@@ -1,4 +1,5 @@
 'use client'
+import React, { ReactElement } from 'react'
 import { useState, useEffect } from 'react'
 import { Move, Plus } from 'lucide-react'
 
@@ -194,7 +195,7 @@ export default function Sidebar({ onSlideUpdate }: SidebarProps = {}) {
   const renderThumbnailContent = (content: string) => {
     const lines = content.split('\n').filter(line => line.trim() !== '')
     let bulletPoints: string[] = []
-    const elements: JSX.Element[] = []
+    const elements: ReactElement[] = []
     
     lines.forEach((line, index) => {
       // Main title (# ) - Center aligned
