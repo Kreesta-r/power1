@@ -31,13 +31,11 @@ const slidesData = [
 • Next.js React application
 • Deployed on Vercel platform
 • Client-side routing and state management
-• Responsive UI components
 • Real-time markdown parsing
 
 **Backend Layer**
 • Express.js API server
-• Deployed on Railway platform
-• RESTful endpoints with CRUD operations`,
+• Deployed on Railway platform`,
     order: 2
   },
   {
@@ -50,12 +48,10 @@ const slidesData = [
 **Next.js Benefits**
 • Server-side rendering capability
 • Built-in optimization features
-• Excellent developer experience
 • Seamless Vercel integration
 
 **Tailwind CSS Advantages**
 • Minimal external dependencies
-• Utility-first approach
 • Consistent design system
 • Reduced CSS file complexity`,
     order: 3
@@ -132,11 +128,7 @@ const slidesData = [
 **Drag and Drop Functionality**
 • Intuitive slide reordering
 • Visual feedback during operations
-• Persistent order changes
-
-**Mobile Responsiveness**
-• Touch gesture support
-• Adaptive layout system`,
+• Persistent order changes`,
     order: 7
   },
   {
@@ -155,8 +147,6 @@ const slidesData = [
 • In-place content modification
 • Live markdown rendering
 • Auto-save functionality
-
-**Slide Deletion**
 • Confirmation dialogs
 • Order rebalancing after removal`,
     order: 8
@@ -176,7 +166,6 @@ const slidesData = [
 • PATCH /api/slides/reorder - Update slide order
 
 **Data Validation**
-• Request payload validation
 • Error handling middleware
 • Response standardization`,
     order: 9
@@ -197,7 +186,6 @@ const slidesData = [
 **Performance Considerations**
 • Efficient re-rendering strategies
 • Optimized database queries
-• Lazy loading implementation
 • Bundle size optimization`,
     order: 10
   },
@@ -217,7 +205,6 @@ const slidesData = [
 **Railway Backend Deployment**
 • Persistent SQLite database
 • Container-based deployment
-• Automatic SSL certificates
 • Database file persistence`,
     order: 11
   },
@@ -254,7 +241,6 @@ const slidesData = [
 • API endpoint verification
 
 **Integration Testing**
-• End-to-end user workflows
 • Database operation testing
 • Cross-browser compatibility
 • Mobile device responsiveness`,
@@ -271,7 +257,6 @@ const slidesData = [
 • Isolated component development
 • Visual component library
 • Interactive component playground
-• Design consistency validation
 
 **Development Benefits**
 • Faster component iteration
@@ -311,8 +296,6 @@ const slidesData = [
 • Markdown-powered slide content
 • Complete CRUD operations
 • Drag and drop slide reordering
-• Modern responsive design
-• Production-ready deployment
 
 **Technical Excellence**
 • Clean, maintainable codebase
@@ -340,11 +323,11 @@ async function seedDatabase() {
     }
     
     console.log('\n🎉 Database seeded successfully!');
-    console.log(`📊 ${slidesData.length} slides created`);
+    console.log(`${slidesData.length} slides created`);
     
     // Verify data
     const count = await Slide.count();
-    console.log(`📈 Total slides in database: ${count}`);
+    console.log(`Total slides in database: ${count}`);
     
   } catch (error) {
     console.error('❌ Error seeding database:', error);
