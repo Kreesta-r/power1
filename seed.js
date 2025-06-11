@@ -147,8 +147,7 @@ const slidesData = [
 • In-place content modification
 • Live markdown rendering
 • Auto-save functionality
-• Confirmation dialogs
-• Order rebalancing after removal`,
+`,
     order: 8
   },
   {
