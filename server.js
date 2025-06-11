@@ -9,26 +9,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-const allowedOrigins = [
-  'https://power0-2c8dn6vfb-kreesta-rs-projects.vercel.app', 
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-  
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true, 
-}));
-
-
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 // Routes
 app.use('/api/slides', slidesRouter);
