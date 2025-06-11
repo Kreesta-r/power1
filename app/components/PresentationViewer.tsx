@@ -19,6 +19,9 @@ interface PresentationViewerProps {
   onSlideCreate: (slide: Omit<Slide, 'id'>) => void
 }
 
+// Get API base URL from environment variable with fallback
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+
 export default function PresentationViewer({ 
   slide, 
   currentIndex, 
@@ -53,7 +56,7 @@ export default function PresentationViewer({
     
     setIsSaving(true)
     try {
-      const response = await fetch(`http://localhost:3001/api/slides/${slide.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/slides/${slide.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +100,7 @@ export default function PresentationViewer({
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/slides/${slide.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/slides/${slide.id}`, {
         method: 'DELETE',
       })
 
@@ -121,7 +124,7 @@ export default function PresentationViewer({
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/slides', {
+      const response = await fetch(`${API_BASE_URL}/api/slides`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -149,12 +152,12 @@ export default function PresentationViewer({
         {/* Minimal header */}
         <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-100">
           <div className="flex items-center space-x-3">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span className="text-sm text-gray-600">Presentation</span>
           </div>
           <button
             onClick={handleAddSlide}
-            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
             title="Add slide"
           >
             <Plus size={18} />
@@ -166,7 +169,7 @@ export default function PresentationViewer({
             <div className="text-gray-400 mb-6 text-lg">No slides yet</div>
             <button
               onClick={handleAddSlide}
-              className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Plus size={20} />
               <span>Create your first slide</span>
@@ -187,10 +190,10 @@ export default function PresentationViewer({
       if (line.startsWith('# ')) {
         return (
           <div key={index} className="text-center mb-8">
-            <h1 className="text-5xl font-bold text-gray-800 leading-tight">
+            <h1 className="text-3xl font-bold text-gray-800 leading-tight">
               {line.slice(2)}
             </h1>
-            <div className="w-16 h-0.5 bg-blue-500 mx-auto mt-6"></div>
+            <div className="w-16 h-0.5 bg-green-500 mx-auto mt-6"></div>
           </div>
         )
       }
@@ -199,7 +202,7 @@ export default function PresentationViewer({
       if (line.startsWith('## ')) {
         return (
           <div key={index} className="mb-6">
-            <h2 className="text-3xl font-semibold text-gray-700 mb-3">
+            <h2 className="text-xl font-semibold text-gray-700 mb-3">
               {line.slice(3)}
             </h2>
           </div>
@@ -209,7 +212,7 @@ export default function PresentationViewer({
       // Subsection headers (### ) - Left aligned, smaller
       if (line.startsWith('### ')) {
         return (
-          <h3 key={index} className="text-2xl font-medium text-gray-600 mb-4">
+          <h3 key={index} className="text-lg font-medium text-gray-600 mb-4">
             {line.slice(4)}
           </h3>
         )
@@ -228,7 +231,7 @@ export default function PresentationViewer({
         if (isLastBullet) {
           const listItems = bulletPoints.map((item, i) => (
             <li key={i} className="text-xl mb-3 text-gray-700 leading-relaxed flex items-start">
-              <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full mr-4 mt-2.5 flex-shrink-0"></span>
+              <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-4 mt-2.5 flex-shrink-0"></span>
               <span dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-800 font-semibold">$1</strong>').replace(/\*(.*?)\*/g, '<em class="text-gray-600">$1</em>') }}></span>
             </li>
           ))
@@ -248,8 +251,8 @@ export default function PresentationViewer({
         const match = line.match(/^\d+\.\s(.*)/)
         if (match) {
           return (
-            <div key={index} className="text-xl mb-3 text-gray-700 leading-relaxed flex items-start">
-              <span className="inline-block w-6 h-6 bg-blue-500 text-white text-sm font-medium rounded-full mr-4 flex-shrink-0 flex items-center justify-center">
+            <div key={index} className="text-sm mb-3 text-gray-700 leading-relaxed flex items-start">
+              <span className="inline-block w-6 h-6 bg-green-500 text-white text-sm font-medium rounded-full mr-4 flex-shrink-0 flex items-center justify-center">
                 {line.match(/^\d+/)?.[0]}
               </span>
               <span 
@@ -272,7 +275,7 @@ export default function PresentationViewer({
       return (
         <p 
           key={index} 
-          className="text-xl mb-4 text-gray-700 leading-relaxed"
+          className="text-md mb-4 text-gray-700 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: processedLine }}
         />
       )
@@ -284,7 +287,7 @@ export default function PresentationViewer({
       {/* Minimal header */}
       <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-100">
         <div className="flex items-center space-x-3">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
           <span className="text-sm text-gray-600">
             {isEditing ? `Editing: ${slide.title}` : slide.title}
           </span>
@@ -354,7 +357,7 @@ export default function PresentationViewer({
       </div>
 
       {/* Slide counter - more subtle */}
-      <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs text-gray-500 border border-gray-200">
+      <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-sm text-gray-500 border border-gray-200">
         {currentIndex + 1} / {totalSlides}
       </div>
 
@@ -375,7 +378,7 @@ export default function PresentationViewer({
                       type="text"
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Slide title"
                     />
                   </div>
@@ -388,10 +391,10 @@ export default function PresentationViewer({
                     <textarea
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
-                      className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
+                      className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none font-mono text-sm"
                       placeholder="# Title&#10;&#10;Your content here...&#10;&#10;- Bullet point&#10;- Another point"
                     />
-                    <div className="mt-2 text-xs text-gray-400">
+                    <div className="mt-2 text-sm text-gray-400">
                       Supports markdown: # titles, ## headers, - bullets, **bold**, *italic*
                     </div>
                   </div>

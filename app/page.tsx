@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import NavigationControls from './components/NavigationControls'
 import PresentationViewer from './components/PresentationViewer'
 
 // Define the Slide type
@@ -11,6 +10,9 @@ interface Slide {
   content: string
   order: number
 }
+
+// Get API base URL from environment variable with fallback
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
 
 export default function Home() {
   const [slides, setSlides] = useState<Slide[]>([])
@@ -22,7 +24,7 @@ export default function Home() {
   const fetchSlides = useCallback(async () => {
     try {
       setLoading(true)
-      const response = await fetch('http://localhost:3001/api/slides')
+      const response = await fetch(`${API_BASE_URL}/api/slides`)
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
       
       const data = await response.json()

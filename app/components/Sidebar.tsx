@@ -14,6 +14,8 @@ interface SidebarProps {
   onSlideUpdate?: (slides: Slide[]) => void
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+
 export default function Sidebar({ onSlideUpdate }: SidebarProps = {}) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [slides, setSlides] = useState<Slide[]>([])
@@ -25,7 +27,7 @@ export default function Sidebar({ onSlideUpdate }: SidebarProps = {}) {
   const fetchSlides = async () => {
     try {
       setLoading(true)
-      const response = await fetch('http://localhost:3001/api/slides')
+      const response = await fetch(`${API_BASE_URL}/api/slides`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -86,7 +88,7 @@ export default function Sidebar({ onSlideUpdate }: SidebarProps = {}) {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/slides', {
+      const response = await fetch(`${API_BASE_URL}/api/slides`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,7 +150,7 @@ export default function Sidebar({ onSlideUpdate }: SidebarProps = {}) {
       setSlides(updatedSlides)
 
       // Update the dragged slide's order in the database
-      const response = await fetch(`http://localhost:3001/api/slides/${draggedSlideData.id}/reorder`, {
+      const response = await fetch(`${API_BASE_URL}/api/slides/${draggedSlideData.id}/reorder`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
